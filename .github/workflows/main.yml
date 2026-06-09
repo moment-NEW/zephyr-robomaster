@@ -1,0 +1,7 @@
+      - name: Merge and Push to Specific Branch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git checkout -b my-sync-branch          # 创建/切换到目标分支
+          git merge upstream/main --no-edit
+          git push origin my-sync-branch          # 推送到 fork 仓库的该分支
