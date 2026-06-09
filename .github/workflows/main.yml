@@ -1,7 +1,29 @@
-      - name: Merge and Push to Specific Branch
+name: Sync Upstream Zephyr
+
+on:
+  schedule:
+    - cron: '0 2 * * *'   # 每天 UTC 2:00 运行（北京时间 10:00）
+  workflow_dispatch:        # 支持手动触发
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Fork
+        uses: actions/checkout@v4
+        with:
+          ref: main                    # 你的 fork 仓库的目标分支
+          fetch-depth: 0               # 获取完整历史
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Add Upstream Remote
+        run: |
+          git remote add upstream https://github.com/zephyrproject-rtos/zephyr.git
+          git fetch upstream
+
+      - name: Merge Upstream into Fork
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git checkout -b my-sync-branch          # 创建/切换到目标分支
-          git merge upstream/main --no-edit
-          git push origin my-sync-branch          # 推送到 fork 仓库的该分支
+          git merge upstream/main --no-edit    # Zephyr 上游的主分支
+          git push origin main                 # 推送到你的 fork 仓库
